@@ -1,0 +1,19 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    if: github.event.repository.fork == false
+    environment: deploy-to-azure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Azure/functions-action@v1
+        with:
+          app-name: LeaveMeAloneGitHubApp
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          respect-funcignore: true
