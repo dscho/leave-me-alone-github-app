@@ -36,15 +36,13 @@ module.exports = async function (context, req) {
         return
     }
 
-    context.log('JavaScript HTTP trigger function processed a request.')
-
-    const name = (req.query.name || (req.body && req.body.name))
-    const responseMessage = name
-        ? "Hello, " + name + ". This HTTP triggered function executed successfully."
-        : "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
+    context.log("Got headers")
+    context.log(req.headers)
+    context.log("Got body")
+    context.log(req.body)
 
     context.res = {
         // status: 200, /* Defaults to 200 */
-        body: responseMessage
+        body: `Received event ${req.headers["x-github-event"]}`
     }
 }
