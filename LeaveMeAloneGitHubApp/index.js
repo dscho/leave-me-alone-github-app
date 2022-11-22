@@ -7,6 +7,9 @@ const validateGitHubWebHook = (context) => {
     if (!secret) {
         throw new Error('Webhook secret not configured')
     }
+    if (context.req.method !== 'POST') {
+        throw new Error(`Unexpected method: ${context.req.method}`)
+    }
     if (context.req.headers['content-type'] !== 'application/json') {
         throw new Error(`Unexpected content type: ${context.req.headers['content-type']}`)
     }
