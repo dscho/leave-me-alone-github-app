@@ -31,7 +31,7 @@ After the deployment succeeded, in the "Overview" tab, there is a "Get publish p
 
 A few environment variables will have to be configured for use with the Azure Function. This can be done on the "Configuration" tab, which is in the "Settings" group.
 
-Concretely, the environment variables `GITHUB_WEBHOOK_SECRET` and `GITHUB_APP_PRIVATE_KEY` need to be set. For the first, a generated random string was used. The private key of the GitHub App is not known at this time, though, therefore it will have to be set in the Azure Function Configuration later.
+Concretely, the environment variables `GITHUB_WEBHOOK_SECRET`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_APP_CLIENT_SECRET`, `GITHUB_APP_CLIENT_ID` and `GITHUB_APP_ID` need to be set. For the first, a generated random string was used. The private key, client secret and ID of the GitHub App are not known at this time, though, therefore they will have to be set in the Azure Function Configuration later.
 
 ### The repository
 
@@ -60,3 +60,7 @@ The GitHub App was then restricted to be used "Only on this account", and once e
 Even at this stage, a private key could not be generated yet, therefore the App had to be registered without it.
 
 After the successful creation, the private key was generated (almost all the way to the bottom, in the section "Private key", there was a button labeled "Generate a private key") and then the middle part (i.e. the lines without the `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----` boilerplate), _without newlines_, was stored as `GITHUB_APP_PRIVATE_KEY` in the Azure Function Configuration (something like `cat ~/Downloads/my-github-app.pem | sed -e 1d -e \$d | tr -d '\n'` prints the desired value).
+
+Likewise, there was now a button labeled "Generate a new client secret" in the "Client secrets" section, and it was used to generate that secret. Subsequently, this secret was stored in the Azure Function Configuration as `GITHUB_APP_CLIENT_SECRET`.
+
+At long last, the "App ID" and the "Client ID" which are reported at the top of the GitHub App page (and which is apparently not _really_ considered to be secret) were stored in the Azure Function Configuration as `GITHUB_APP_ID` and `GITHUB_APP_CLIENT_ID`, respectively.
