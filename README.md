@@ -59,4 +59,4 @@ The GitHub App was then restricted to be used "Only on this account", and once e
 
 Even at this stage, a private key could not be generated yet, therefore the App had to be registered without it.
 
-After the successful creation, the private key was generated and then the middle part (i.e. the lines without the `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----` boilerplate), _without newlines_, was stored as `GITHUB_APP_PRIVATE_KEY` in the Azure Function Configuration.
+After the successful creation, the private key was generated (almost all the way to the bottom, in the section "Private key", there was a button labeled "Generate a private key") and then the middle part (i.e. the lines without the `-----BEGIN RSA PRIVATE KEY-----` and `-----END RSA PRIVATE KEY-----` boilerplate), _without newlines_, was stored as `GITHUB_APP_PRIVATE_KEY` in the Azure Function Configuration (something like `cat ~/Downloads/my-github-app.pem | sed -e 1d -e \$d | tr -d '\n'` prints the desired value).
