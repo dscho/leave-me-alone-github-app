@@ -15,6 +15,45 @@ The only practical use of this GitHub App is to demonstrate
 - how to use the GitHub App's credentials to call GitHub's REST API in a pure node.js script without needing to install any packages, and
 - how to deploy the Azure Function continuously from a GitHub repository.
 
+## Tips & Tricks for developing this GitHub App
+
+### Debug/test-run as much Javascript via the command-line as possible
+
+The easiest, and quickest, way to test most of the Javascript code is to run it on the command-line, via `node`.
+
+To facilitate that, as much functionality is implemented in modules as possible.
+
+### Run the Azure Function locally
+
+It is tempting to try to develop the Azure Function part of this GitHub App directly in the Azure Portal, but it is cumbersome and slow, and also impossibly unwieldy once the Azure Function has been deployed via GitHub (because that disables editing the Javascript code in the Portal).
+
+Instead of pushing the code to Azure all the time, waiting until it is deployed, reading the logs, then editing the code, committing and starting another cycle, it is much, much less painful to develop the Azure Function locally.
+
+To this end, [install the Azure Functions Core Tools (for performance, use Linux)](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Clinux%2Ccsharp%2Cportal%2Cbash#install-the-azure-functions-core-tools), e.g. via WSL.
+
+Then, configure [the `GITHUB_*` variables](#some-environment-variables) locally, via [a `local.settings.json` file](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-local#local-settings-file). The contents would look like this:
+
+```json
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "<storage-key>",
+    "GITHUB_APP_CLIENT_ID": "<client-id>",
+    "GITHUB_APP_CLIENT_SECRET": "<client-secret>",
+    "GITHUB_APP_PRIVATE_KEY": "<private-key>",
+    "GITHUB_WEBHOOK_SECRET": "<webhook-secret>"
+  },
+  "Host": {
+    "LocalHttpPort": 7071,
+    "CORS": "*",
+    "CORSCredentials": false
+  }
+}
+```
+
+Finally, [run the Function locally](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Clinux%2Cnode%2Cportal%2Cbash#start) by calling `func start` on the command-line.
+
 ## How this GitHub App was set up
 
 This process looks a bit complex, but the main reason for that is that three things have to be set up essentially simultaneously: an Azure Function, a GitHub repository and a GitHub App.
