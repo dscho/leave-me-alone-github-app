@@ -28,7 +28,7 @@ const validateGitHubWebHook = (context) => {
 }
 
 /** Sends a JWT-authenticated GitHub API request */
-const sendAuthenticatedGitHubAPIRequest = (context, appId, requestMethod, requestPath, body) => {
+const sendAuthenticatedGitHubAPIRequest = async (context, appId, requestMethod, requestPath, body) => {
     const header = {
         "alg": "RS256",
         "typ": "JWT"
