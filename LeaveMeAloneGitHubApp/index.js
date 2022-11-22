@@ -110,7 +110,6 @@ module.exports = async function (context, req) {
             status: 403,
             body: `Go away, you are not a valid GitHub webhook: ${e}`,
         }
-        context.done()
         return
     }
 
@@ -130,7 +129,6 @@ module.exports = async function (context, req) {
                 body: `Error:\n${e}`,
             }
         }
-        context.done()
         return
     }
 
