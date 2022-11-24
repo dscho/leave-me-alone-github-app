@@ -4,15 +4,23 @@ const validateGitHubWebHook = require('./validate-github-webhook')
 const gitHubApiRequestAsApp = require('./github-api-request-as-app')
 
 module.exports = async function (context, req) {
+    const withStatus = (status, headers, body) => {
+        context.res = {
+            status,
+            headers,
+            body
+        }
+    }
+
+    const ok = (body) => {
+        withStatus(undefined, undefined, body)
+    }
+
     try {
         validateGitHubWebHook(context)
     } catch (e) {
         context.log(e)
-        context.res = {
-            status: 403,
-            body: `Go away, you are not a valid GitHub webhook: ${e}`,
-        }
-        return
+        return withStatus(403, undefined, `Go away, you are not a valid GitHub webhook: ${e}`)
     }
 
     if (req.headers['x-github-event'] === 'installation' && req.body.action === 'created') {
@@ -26,10 +34,7 @@ module.exports = async function (context, req) {
             }
         } catch (e) {
             context.log(e)
-            context.res = {
-                status: 500,
-                body: `Error:\n${e}`,
-            }
+            return withStatus(500, undefined, `Error:\n${e}`)
         }
         return
     }
@@ -39,8 +44,5 @@ module.exports = async function (context, req) {
     context.log("Got body")
     context.log(req.body)
 
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: `Received event ${req.headers["x-github-event"]}`
-    }
+    ok(`Received event ${req.headers["x-github-event"]}`)
 }
