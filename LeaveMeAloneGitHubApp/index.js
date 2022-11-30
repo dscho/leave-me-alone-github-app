@@ -7,6 +7,9 @@ const validateGitHubWebHook = (context) => {
     if (!secret) {
         throw new Error('Webhook secret not configured')
     }
+    if (context.req.method !== 'POST') {
+        throw new Error(`Unexpected method: ${context.req.method}`)
+    }
     if (context.req.headers['content-type'] !== 'application/json') {
         throw new Error(`Unexpected content type: ${context.req.headers['content-type']}`)
     }
@@ -25,7 +28,7 @@ const validateGitHubWebHook = (context) => {
 }
 
 /** Sends a JWT-authenticated GitHub API request */
-const sendAuthenticatedGitHubAPIRequest = (context, appId, requestMethod, requestPath, body) => {
+const sendAuthenticatedGitHubAPIRequest = async (context, appId, requestMethod, requestPath, body) => {
     const header = {
         "alg": "RS256",
         "typ": "JWT"
@@ -107,7 +110,6 @@ module.exports = async function (context, req) {
             status: 403,
             body: `Go away, you are not a valid GitHub webhook: ${e}`,
         }
-        context.done()
         return
     }
 
@@ -127,7 +129,6 @@ module.exports = async function (context, req) {
                 body: `Error:\n${e}`,
             }
         }
-        context.done()
         return
     }
 
