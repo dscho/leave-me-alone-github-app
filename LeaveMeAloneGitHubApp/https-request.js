@@ -22,20 +22,18 @@ module.exports = async (context, hostname, method, requestPath, body, headers) =
             const req = https.request(options, res => {
                 res.on('error', e => reject(e))
 
-                res.setEncoding('utf8')
-                var response = ''
-                res.on('data', (chunk) => {
-                    response += chunk
-                })
+                const chunks = []
+                res.on('data', data => chunks.push(data))
                 res.on('end', () => {
-                    if (!response) {
-                        resolve(response)
+                    const json = Buffer.concat(chunks).toString('utf-8')
+                    if (res.statusCode > 299) {
+                        reject(`Got status ${res.statusCode} ${res.statusMessage}\n${json}`)
                         return
                     }
                     try {
-                        resolve(JSON.parse(response))
+                        resolve(JSON.parse(json))
                     } catch (e) {
-                        reject(e)
+                        reject(`Invalid JSON: ${json}`)
                     }
                 })
             })
