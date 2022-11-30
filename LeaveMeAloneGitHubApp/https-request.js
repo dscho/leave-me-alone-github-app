@@ -22,8 +22,6 @@ module.exports = async (context, hostname, method, requestPath, body, headers) =
             const req = https.request(options, res => {
                 res.on('error', e => reject(e))
 
-                context.log(`${requestPath} returned ${res.statusCode}`)
-                context.log(res.headers)
                 res.setEncoding('utf8')
                 var response = ''
                 res.on('data', (chunk) => {
