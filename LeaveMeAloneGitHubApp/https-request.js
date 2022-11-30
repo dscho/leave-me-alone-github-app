@@ -1,6 +1,6 @@
 module.exports = async (context, hostname, method, requestPath, body, headers) => {
     headers = {
-        'User-Agent': 'curl/7.68.0',
+        'User-Agent': 'LeaveMeAloneGitHubApp/0.0',
         Accept: 'application/json',
         ...headers || {}
     }
