@@ -1,5 +1,4 @@
 const crypto = require('crypto')
-const https = require('https')
 
 /** Validates the signature added by GitHub */
 const validateGitHubWebHook = (context) => {
@@ -58,47 +57,16 @@ const gitHubApiRequestAsApp = async (context, appId, requestMethod, requestPath,
 
     const token = `${headerAndPayload}.${signature}`
 
-    return new Promise((resolve, reject) => {
-      const request = https.request({
-            host: "api.github.com",
-            port: 443,
-            path: requestPath,
-            method: requestMethod || "GET",
-            headers: {
-                "User-Agent": "curl/7.68.0",
-                Authorization: `Bearer ${token}`,
-                Accept: "application/vnd.github+json"
-            }
-        }, (res, e) => {
-            if (e) {
-                reject(e)
-                return
-            }
-            context.log(`${requestPath} returned ${res.statusCode}`)
-            context.log(res.headers)
-            res.setEncoding('utf8')
-            var response = ''
-            res.on('data', (chunk) => {
-                response += chunk
-            })
-            res.on('end', () => {
-                if (!response) {
-                    resolve(response)
-                    return
-                }
-                try {
-                    resolve(JSON.parse(response))
-                } catch (e) {
-                    reject(e)
-                }
-            })
-            res.on('error', (e) => {
-                reject(e)
-            })
-        })
-        if (body) request.write(body)
-        request.end()
-    })
+    const httpsRequest = require('./https-request')
+    return await httpsRequest(
+        context,
+        requestMethod,
+        requestPath,
+        body,
+        {
+            Authorization: `Bearer ${token}`,
+        }
+    )
 }
 
 module.exports = async function (context, req) {
