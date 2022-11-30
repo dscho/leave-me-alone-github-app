@@ -60,6 +60,7 @@ const gitHubApiRequestAsApp = async (context, appId, requestMethod, requestPath,
     const httpsRequest = require('./https-request')
     return await httpsRequest(
         context,
+        null,
         requestMethod,
         requestPath,
         body,

@@ -1,4 +1,4 @@
-module.exports = async (context, method, requestPath, body, headers) => {
+module.exports = async (context, hostname, method, requestPath, body, headers) => {
     headers = {
         'User-Agent': 'curl/7.68.0',
         Accept: 'application/json',
@@ -10,8 +10,8 @@ module.exports = async (context, method, requestPath, body, headers) => {
         headers['Content-Length'] = body.length
     }
     const options = {
-        hostname: 'api.github.com',
         port: 443,
+        hostname: hostname || 'api.github.com',
         method: method || 'GET',
         path: requestPath,
         headers
