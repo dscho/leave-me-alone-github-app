@@ -1,3 +1,5 @@
+const gently = require('./gently')
+
 module.exports = async (context, hostname, method, requestPath, body, headers) => {
     headers = {
         'User-Agent': 'LeaveMeAloneGitHubApp/0.0',
@@ -33,7 +35,14 @@ module.exports = async (context, hostname, method, requestPath, body, headers) =
                 res.on('end', () => {
                     const json = Buffer.concat(chunks).toString('utf-8')
                     if (res.statusCode > 299) {
-                        reject(`Got status ${res.statusCode} ${res.statusMessage}\n${json}`)
+                        context.log('FAILED HTTPS request!')
+                        context.log(options)
+                        reject({
+                            statusCode: res.statusCode,
+                            statusMessage: res.statusMessage,
+                            body: json,
+                            json: gently(() => JSON.parse(json))
+                        })
                         return
                     }
                     try {
