@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - '.github/workflows/deploy.yml'
+      - 'LeaveMeAloneGitHubApp/**'
 
 jobs:
   deploy:
