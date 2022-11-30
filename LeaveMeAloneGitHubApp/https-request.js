@@ -4,6 +4,11 @@ module.exports = async (context, requestMethod, requestPath, body, headers) => {
         Accept: 'application/json',
         ...headers || {}
     }
+    if (body) {
+        if (typeof body === 'object') body = JSON.stringify(body)
+        headers['Content-Type'] = 'application/json'
+        headers['Content-Length'] = body.length
+    }
     const options = {
         hostname: 'api.github.com',
         port: 443,
