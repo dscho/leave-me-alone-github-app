@@ -1,17 +1,19 @@
 module.exports = async (context, requestMethod, requestPath, body, headers) => {
+    headers = {
+        'User-Agent': 'curl/7.68.0',
+        Accept: 'application/json',
+        ...headers || {}
+    }
+    const options = {
+        hostname: 'api.github.com',
+        port: 443,
+        path: requestPath,
+        method: requestMethod || 'GET',
+        headers
+    }
     return new Promise((resolve, reject) => {
         const https = require('https')
-        const request = https.request({
-            host: "api.github.com",
-            port: 443,
-            path: requestPath,
-            method: requestMethod || "GET",
-            headers: {
-                "User-Agent": "curl/7.68.0",
-                Accept: "application/vnd.github+json",
-		...headers
-            }
-        }, (res, e) => {
+        const request = https.request(options, (res, e) => {
             if (e) {
                 reject(e)
                 return
