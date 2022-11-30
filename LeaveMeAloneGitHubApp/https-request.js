@@ -19,11 +19,9 @@ module.exports = async (context, hostname, method, requestPath, body, headers) =
     return new Promise((resolve, reject) => {
         try {
             const https = require('https')
-            const req = https.request(options, (res, e) => {
-                if (e) {
-                    reject(e)
-                    return
-                }
+            const req = https.request(options, res => {
+                res.on('error', e => reject(e))
+
                 context.log(`${requestPath} returned ${res.statusCode}`)
                 context.log(res.headers)
                 res.setEncoding('utf8')
@@ -42,10 +40,8 @@ module.exports = async (context, hostname, method, requestPath, body, headers) =
                         reject(e)
                     }
                 })
-                res.on('error', (e) => {
-                    reject(e)
-                })
             })
+            req.on('error', err => reject(err))
             if (body) req.write(body)
             req.end()
         } catch (e) {
