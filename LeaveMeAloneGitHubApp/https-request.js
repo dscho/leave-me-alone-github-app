@@ -19,7 +19,7 @@ module.exports = async (context, hostname, method, requestPath, body, headers) =
     return new Promise((resolve, reject) => {
         try {
             const https = require('https')
-            const request = https.request(options, (res, e) => {
+            const req = https.request(options, (res, e) => {
                 if (e) {
                     reject(e)
                     return
@@ -46,8 +46,8 @@ module.exports = async (context, hostname, method, requestPath, body, headers) =
                     reject(e)
                 })
             })
-            if (body) request.write(body)
-            request.end()
+            if (body) req.write(body)
+            req.end()
         } catch (e) {
             reject(e)
         }
