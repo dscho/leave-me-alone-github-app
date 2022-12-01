@@ -1,44 +1,26 @@
-const crypto = require('crypto')
-
-/** Validates the signature added by GitHub */
-const validateGitHubWebHook = (context) => {
-    const secret = process.env['GITHUB_WEBHOOK_SECRET']
-    if (!secret) {
-        throw new Error('Webhook secret not configured')
-    }
-    if (context.req.method !== 'POST') {
-        throw new Error(`Unexpected method: ${context.req.method}`)
-    }
-    if (context.req.headers['content-type'] !== 'application/json') {
-        throw new Error(`Unexpected content type: ${context.req.headers['content-type']}`)
-    }
-    const signature = context.req.headers['x-hub-signature-256']
-    if (!signature) {
-        throw new Error('Missing X-Hub-Signature')
-    }
-    const sha256 = signature.match(/^sha256=(.*)/)
-    if (!sha256) {
-        throw new Error(`Unexpected X-Hub-Signature format: ${signature}`)
-    }
-    const computed = crypto.createHmac('sha256', secret).update(context.req.rawBody).digest('hex')
-    if (sha256[1] !== computed) {
-        throw new Error('Incorrect X-Hub-Signature')
-    }
-}
+const validateGitHubWebHook = require('./validate-github-webhook')
 
 /** Sends a JWT-authenticated GitHub API request */
 const gitHubApiRequestAsApp = require('./github-api-request-as-app')
 
 module.exports = async function (context, req) {
+    const withStatus = (status, headers, body) => {
+        context.res = {
+            status,
+            headers,
+            body
+        }
+    }
+
+    const ok = (body) => {
+        withStatus(undefined, undefined, body)
+    }
+
     try {
         validateGitHubWebHook(context)
     } catch (e) {
         context.log(e)
-        context.res = {
-            status: 403,
-            body: `Go away, you are not a valid GitHub webhook: ${e}`,
-        }
-        return
+        return withStatus(403, undefined, `Go away, you are not a valid GitHub webhook: ${e}`)
     }
 
     if (req.headers['x-github-event'] === 'installation' && req.body.action === 'created') {
@@ -52,10 +34,7 @@ module.exports = async function (context, req) {
             }
         } catch (e) {
             context.log(e)
-            context.res = {
-                status: 500,
-                body: `Error:\n${e}`,
-            }
+            return withStatus(500, undefined, `Error:\n${e}`)
         }
         return
     }
@@ -65,8 +44,5 @@ module.exports = async function (context, req) {
     context.log("Got body")
     context.log(req.body)
 
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: `Received event ${req.headers["x-github-event"]}`
-    }
+    ok(`Received event ${req.headers["x-github-event"]}`)
 }
